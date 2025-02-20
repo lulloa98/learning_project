@@ -1,0 +1,35 @@
+default_install_hook_types:
+  - pre-commit
+  - post-checkout
+  - post-merge
+  - post-rewrite
+
+repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.6.2
+    hooks:
+      - id: uv-lock
+      - id: uv-export
+      - id: uv-sync
+
+  - repo: local
+    hooks:
+      - id: validate-env-files
+        name: Validate Python Virtual Environment Files
+        entry: task venv:debug:validate-all-env-files
+        pass_filenames: false
+        language: system
+        stages: [ push ]
+      - id: format
+        name: Run Formatter
+        entry: task style:fmt
+        pass_filenames: false
+        language: system
+        stages: [ push ]
+      - id: lint
+        name: Run Linter
+        entry: task style:lint
+        pass_filenames: false
+        language: system
+        stages: [ push ]

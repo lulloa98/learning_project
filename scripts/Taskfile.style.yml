@@ -1,0 +1,85 @@
+version: 3
+
+tasks:
+  style:fmt:
+    desc: Format code
+    deps:
+      - venv:install-dev
+    cmds:
+      #     TODO: SQLFluff doesn't support IDENTIFIER clause yet. We need to create an issue for them
+      #      - echo "Running SQL Formatter"
+      #      - task: style:fmt-sql
+      - echo "Running YAML Formatter"
+      - task: style:fmt-yml
+      - echo "Running Markdown Formatter"
+      - task: style:fmt-markdown
+      - echo "Running Python Formatter"
+      - task: style:fmt-python
+
+  style:lint:
+    desc: Linting code
+    deps:
+      - venv:install-dev
+    cmds:
+      #     TODO: SQLFluff doesn't support IDENTIFIER clause yet. We need to create an issue for them
+      #      - echo "Running SQL Linter"
+      #      - task: style:lint-sql
+      - echo "Running YAML Linter"
+      - task: style:lint-yml
+      - echo "Running Markdown Linter"
+      - task: style:lint-markdown
+      - echo "Running Python Linter"
+      - task: style:lint-python
+
+  style:fmt-sql:
+    desc: Format SQL code
+    internal: true
+    cmds:
+      - uvx run sqlfluff fix
+
+  style:lint-sql:
+    desc: Lint SQL code
+    internal: true
+    cmds:
+      - uvx run sqlfluff lint
+
+  style:fmt-yml:
+    desc: Format YAML code
+    internal: true
+    cmds:
+      - yamlfmt .
+
+  style:lint-yml:
+    desc: Lint YAML code
+    internal: true
+    cmds:
+      - yamllint --no-warnings .
+
+  style:fmt-markdown:
+    desc: Format Markdown code
+    internal: true
+    cmds:
+      - markdownlint-cli2 --fix
+
+  style:lint-markdown:
+    desc: Lint Markdown code
+    internal: true
+    cmds:
+      - markdownlint-cli2
+
+  style:fmt-python:
+    desc: Format Python code
+    internal: true
+    cmds:
+      - uvx run ruff format
+      - uvx run ruff check --fix
+
+  style:lint-python:
+    desc: Lint Python code
+    internal: true
+    requires:
+      vars: [python_components]
+    cmds:
+      - uvx run ruff check
+      - for: {var: python_components}
+        cmd: uvx run mypy {{.ITEM}}

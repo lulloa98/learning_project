@@ -1,0 +1,72 @@
+version: 3
+
+includes:
+  venv:
+    taskfile: ./scripts/Taskfile.venv.uv.yml
+    flatten: true
+  style:
+    taskfile: ./scripts/Taskfile.style.yml
+    flatten: true
+
+vars:
+  venvs: [
+    '.',
+    'scripts/',
+    'tests/',
+  ]
+  python_components: [
+    'scripts/',
+    'tests/',
+  ]
+
+tasks:
+  init:
+    desc: Sets up repo, so other tasks can run
+    cmds:
+      - task: install-cli-tools
+      - for: {var: venvs}
+        cmd: cd {{.ITEM}} && task venv:install-dev
+      - pre-commit install
+
+  install-cli-tools:
+    desc: Install CLI tools
+    internal: true
+    cmds:
+      - echo "Installing CLI tools"
+      - asdf plugin add python
+      - asdf plugin add poetry
+      - asdf plugin add yamlfmt
+      - asdf plugin add yamllint
+      - asdf plugin add pre-commit
+      - asdf plugin add nodejs # markdownlint-cli2 needs it
+      - asdf plugin add markdownlint-cli2
+      - asdf plugin add mdbook
+      - asdf install
+
+  venv:debug:validate-all-env-files:
+    desc: Validate all environment files
+    cmds:
+      - for: {var: venvs}
+        cmd: cd {{.ITEM}} && task venv:debug:validate-env-files
+
+  tests:run:
+    desc: Run tests
+    deps:
+      - venv:install-dev
+    cmds:
+      - echo "Running tests"
+      - for: {var: python_components}
+        cmd: cd {{.ITEM}} && task tests:run
+
+  tests:coverage:
+    desc: Calculate test coverage
+    deps:
+      - venv:install-dev
+    cmds:
+      - echo "Calculating test coverage"
+      - for: {var: python_components}
+        cmd: cd {{.ITEM}} && task tests:coverage
+      - for: {var: python_components}
+        cmd: poetry run coverage combine --keep --append {{.ITEM}}/.coverage
+      - uvx run coverage report -m
+      - uvx run coverage xml

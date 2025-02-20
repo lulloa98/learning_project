@@ -1,0 +1,17 @@
+.DS_Store
+.idea
+.vscode
+.venv*/
+.conda*/
+.databricks
+dist/
+book
+.coverage
+coverage.xml
+_pycache_/
+**_pycache_
+**.pyc
+**venv
+**logs
+**target
+**user.yml

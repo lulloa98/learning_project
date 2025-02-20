@@ -1,0 +1,34 @@
+version: 3
+
+tasks:
+  venv:install:
+    desc: Install dependencies
+    cmds:
+      - echo "Installing dependencies for {{.USER_WORKING_DIR}}"
+      - uvx install --no-root --without dev
+
+  venv:install-dev:
+    desc: Install development dependencies
+    cmds:
+      - echo "Installing development dependencies for {{.USER_WORKING_DIR}}"
+      - uvx install --no-root
+
+  venv:debug:validate-env-files:
+    desc: Validate environment files
+    cmds:
+      - echo "Validating venv files in {{.USER_WORKING_DIR}}"
+      - uvx check
+      - uvx check --lock
+
+    venv:debug:rebuild-lock-file:
+      desc: Rebuild lock file
+      cmds:
+        - echo "Rebuilding lock file in {{.USER_WORKING_DIR}}"
+        - uvx lock --no-update
+
+    venv:debug:recreate-venv:
+      desc: Recreate virtual environment
+      cmds:
+        - echo "Recreating virtual environment for {{.USER_WORKING_DIR}}"
+        - uvx env remove "$(uvx env list | awk '{print $1}')"
+        - task: venv:install-dev

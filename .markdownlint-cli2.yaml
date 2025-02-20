@@ -1,0 +1,15 @@
+# Use this example to configure markdownlint-cli: https://github.com/DavidAnson/markdownlint-cli2/blob/main/test/markdownlint-cli2-yaml-example/.markdownlint-cli2.yaml
+
+globs:
+  - "*/.md"
+
+# Configure using this: https://github.com/markdownlint/markdownlint/blob/main/docs/RULES.md
+# Each rule has its configuration. Use the rule's alias to configure it.
+# disable a rule by setting it to false
+config:
+  MD013: false
+  MD036: false
+  first-line-h1: false
+
+ignores:
+  - .venv/**
